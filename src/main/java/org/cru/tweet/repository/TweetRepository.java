@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TweetRepository extends JpaGuidRepository<Tweet, Long> {
     Page<Tweet> findByFromUser(User user, Pageable pageable);
+    Tweet findByFromUserAndGuid(User user, String tweetGuid);
 }

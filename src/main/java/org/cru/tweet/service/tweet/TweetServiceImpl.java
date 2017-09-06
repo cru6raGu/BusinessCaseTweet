@@ -30,6 +30,11 @@ public class TweetServiceImpl implements TweetService {
     TweetFollowerRepository tweetFollowerRepository;
 
     @Override
+    public Tweet findTweetsByUserAndTweetGuid(User user, String tweetGuid) {
+        return tweetRepository.findByFromUserAndGuid(user, tweetGuid);
+    }
+
+    @Override
     public Page<Tweet> findTweetsByUser(User user, Pageable pageable) {
         return tweetRepository.findByFromUser(user, pageable);
     }

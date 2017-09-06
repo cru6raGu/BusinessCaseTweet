@@ -9,8 +9,6 @@ import org.cru.tweet.view.internal.AbstractExternalView;
 public class UserView extends AbstractExternalView {
     private String guid;
 
-    private String username;
-
     private String email;
 
     private String first_name;

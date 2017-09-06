@@ -99,9 +99,27 @@ public class TweetQueryControllerTest extends AbstractControllerTest {
                 .andExpect(listFirstItemContains("fromUser.guid", randomUser.getGuid()))
                 .andExpect(listFirstItemContains("toUsers[0].email", randomToUserList.get(0).getEmail()))
                 .andExpect(listFirstItemContains("toUsers[0].guid", randomToUserList.get(0).getGuid()))
+                .andExpect(listFirstItemContains("links[0].href", String.format("%s" + API_BASE_URL + TWEET_BASE_URL + "/%s?userGuidBackdoor=%s", "http://localhost", randomTweetList.iterator().next().getGuid(), randomUser.getGuid())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 
     }
 
 
+    @Test
+    public void testGetTweet_simple() throws Exception {
+
+        when(ldapService.getLoggedInUser(null)).thenReturn(randomUser);
+        when(tweetService.findTweetsByUserAndTweetGuid(randomUser, randomTweetList.iterator().next().getGuid())).thenReturn(randomTweetList.iterator().next());
+
+        mockMvc.perform(get(API_BASE_URL + TWEET_BASE_URL + "/" + randomTweetList.iterator().next().getGuid())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(contains("fromUser.email", randomUser.getEmail()))
+                .andExpect(contains("fromUser.guid", randomUser.getGuid()))
+                .andExpect(contains("toUsers[0].email", randomToUserList.get(0).getEmail()))
+                .andExpect(contains("toUsers[0].guid", randomToUserList.get(0).getGuid()))
+                .andExpect(contains("links[0].href", String.format("%s" + API_BASE_URL + TWEET_BASE_URL + "/%s?userGuidBackdoor=%s", "http://localhost", randomTweetList.iterator().next().getGuid(), randomUser.getGuid())))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+
+    }
 }
