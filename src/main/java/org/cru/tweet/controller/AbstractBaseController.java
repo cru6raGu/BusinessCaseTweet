@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.cru.tweet.view.internal.RetrievalView;
+import org.springframework.data.domain.Pageable;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,5 +25,4 @@ public abstract class AbstractBaseController {
 
         return null;
     }
-
 }

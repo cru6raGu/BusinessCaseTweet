@@ -3,6 +3,7 @@ package org.cru.tweet.domain.jpa.tweet;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.cru.tweet.domain.jpa.AbstractExternalImmutableDomainObject;
 import org.cru.tweet.domain.jpa.AbstractExternalMutableDomainObject;
 import org.cru.tweet.domain.jpa.user.User;
 
@@ -12,9 +13,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 @Table(name = "tweet")
-public class Tweet extends AbstractExternalMutableDomainObject<Long> {
+public class Tweet extends AbstractExternalImmutableDomainObject<Long> {
     @Column(name = "tweet")
     private String tweet;
 

@@ -6,6 +6,7 @@ import org.cru.tweet.domain.jpa.user.User;
 import org.cru.tweet.service.ldap.LdapService;
 import org.cru.tweet.service.tweet.TweetService;
 import org.cru.tweet.view.TweetView;
+import org.cru.tweet.view.TweetsRetrievalView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.cru.tweet.controller.constant.RequestMappingConstant.API_BASE_URL;
 import static org.cru.tweet.controller.constant.RequestMappingConstant.TWEET_BASE_URL;
@@ -32,8 +34,8 @@ public class TweetQueryController extends AbstractBaseController {
     TweetService tweetService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<List<TweetView>> getTweets(@RequestParam(value = "userGuidBackdoor", required = false) String userGuidBackdoor,
-                                                    @PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<TweetsRetrievalView> getTweets(@RequestParam(value = "userGuidBackdoor", required = false) String userGuidBackdoor,
+                                                         @PageableDefault(size = 10) Pageable pageable) {
         log.debug(String.format("calling getTweets %s %s", userGuidBackdoor, pageable));
 
         User user = ldapService.getLoggedInUser(userGuidBackdoor);
@@ -44,7 +46,17 @@ public class TweetQueryController extends AbstractBaseController {
             tweetView.add(linkTo(methodOn(TweetQueryController.class).getTweet(user.getGuid(), tweetView.getGuid())).withRel("self"));
         }
 
-        return ResponseEntity.ok(views);
+        // add the tweets to the final response view with tweet list size
+        //TODO make setting page info as a reusable component
+        TweetsRetrievalView tweetsRetrievalView =  new TweetsRetrievalView();
+        tweetsRetrievalView.setTweets(views);
+        tweetsRetrievalView.setTotalPage(tweets.getTotalPages());
+        tweetsRetrievalView.setPageSize(pageable.getPageSize());
+        tweetsRetrievalView.setTotalSize(tweets.getTotalElements());
+        tweetsRetrievalView.setPage(pageable.getPageNumber());
+        tweetsRetrievalView.setSize(tweets.getContent().size());
+
+        return ResponseEntity.ok(tweetsRetrievalView);
     }
 
     @RequestMapping(value = "/{tweetGuid}", method = RequestMethod.GET)
@@ -56,7 +68,9 @@ public class TweetQueryController extends AbstractBaseController {
         Tweet tweet = tweetService.findTweetsByUserAndTweetGuid(user, tweetGuid);
         TweetView view = mapper.map(tweet, TweetView.class);
 
-        view.add(linkTo(methodOn(TweetQueryController.class).getTweet(user.getGuid(), tweetGuid)).withRel("self"));
+        if (Objects.nonNull(view)) {
+            view.add(linkTo(methodOn(TweetQueryController.class).getTweet(user.getGuid(), tweetGuid)).withRel("self"));
+        }
 
         return ResponseEntity.ok(view);
     }

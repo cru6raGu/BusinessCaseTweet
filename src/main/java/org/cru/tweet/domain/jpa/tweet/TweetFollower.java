@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 @Table(name = "tweet_follower")
 public class TweetFollower extends AbstractExternalImmutableDomainObject<Long> {
     @ManyToOne(fetch = FetchType.EAGER)
